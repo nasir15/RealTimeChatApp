@@ -43,6 +43,7 @@ class ChatGroupForm(forms.ModelForm):
 
     def save(self, creator, commit=True):
         group = super().save(commit=False)
+        group.created_by = creator
         if not group.slug:
             group.slug = slugify(group.name)
         if commit:
