@@ -1,0 +1,257 @@
+:root {
+    --bg: #f3efe7;
+    --panel: #fffdf8;
+    --ink: #1c1b19;
+    --muted: #6b6256;
+    --line: #ddd2c4;
+    --accent: #c55b3d;
+    --accent-strong: #a54124;
+    --bubble: #f7ecdf;
+    --bubble-own: #202b3a;
+    --bubble-own-ink: #f8f4ed;
+    --success: #2f7d5b;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at top left, rgba(197, 91, 61, 0.18), transparent 30%),
+        linear-gradient(160deg, #f7f2e9 0%, #efe4d3 100%);
+}
+
+a {
+    color: inherit;
+}
+
+.app-shell {
+    padding: 24px;
+}
+
+.flash-stack {
+    display: grid;
+    gap: 10px;
+    max-width: 720px;
+    margin: 0 auto 18px;
+}
+
+.flash {
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+}
+
+.auth-card,
+.blank-room {
+    max-width: 560px;
+    margin: 60px auto;
+    background: rgba(255, 253, 248, 0.95);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 24px 80px rgba(51, 36, 22, 0.12);
+}
+
+.auth-form p,
+.group-form p {
+    display: grid;
+    gap: 8px;
+}
+
+input,
+textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+}
+
+button,
+.logout-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+    font: inherit;
+}
+
+button.secondary {
+    background: #efe3d6;
+    color: var(--ink);
+}
+
+button:hover,
+.logout-link:hover {
+    background: var(--accent-strong);
+}
+
+.chat-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.chat-sidebar {
+    display: grid;
+    gap: 18px;
+}
+
+.sidebar-card,
+.chat-room {
+    background: rgba(255, 253, 248, 0.95);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: 0 24px 80px rgba(51, 36, 22, 0.08);
+}
+
+.sidebar-header,
+.room-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.conversation-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+    display: grid;
+    gap: 10px;
+}
+
+.conversation-list a {
+    display: grid;
+    gap: 4px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    background: #fffaf3;
+}
+
+.conversation-list a.active {
+    border-color: var(--accent);
+    transform: translateX(4px);
+}
+
+.conversation-list small,
+.room-header p,
+.auth-card p,
+.blank-room p {
+    color: var(--muted);
+}
+
+.message-list {
+    min-height: 420px;
+    max-height: 62vh;
+    overflow-y: auto;
+    display: grid;
+    gap: 12px;
+    padding: 18px 0;
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: 14px 16px;
+    border-radius: 18px 18px 18px 6px;
+    background: var(--bubble);
+    animation: slideIn 180ms ease-out;
+}
+
+.message-bubble.own {
+    margin-left: auto;
+    border-radius: 18px 18px 6px 18px;
+    background: var(--bubble-own);
+    color: var(--bubble-own-ink);
+}
+
+.message-bubble header {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    opacity: 0.8;
+}
+
+.message-bubble p {
+    margin: 0 0 8px;
+    white-space: pre-wrap;
+}
+
+.message-bubble time {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.composer {
+    display: grid;
+    gap: 12px;
+}
+
+.typing-indicator {
+    min-height: 24px;
+    color: var(--success);
+    font-style: italic;
+}
+
+.empty-state {
+    color: var(--muted);
+}
+
+.notification-tray {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    display: grid;
+    gap: 10px;
+    z-index: 50;
+}
+
+.notification {
+    max-width: 320px;
+    background: #fff8ef;
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--accent);
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 18px 40px rgba(51, 36, 22, 0.15);
+    animation: slideIn 220ms ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 960px) {
+    .chat-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .message-bubble {
+        max-width: 86%;
+    }
+}

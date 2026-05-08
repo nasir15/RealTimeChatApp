@@ -1,0 +1,16 @@
+{% extends 'realtime_chat/base.html' %}
+
+{% block title %}Sign Up | Realtime Chat{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+    <h1>Create your account</h1>
+    <p>Set up a user profile and jump into private or group conversations.</p>
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Sign up</button>
+    </form>
+    <p class="auth-link">Already registered? <a href="{% url 'realtime_chat:login' %}">Log in</a></p>
+</div>
+{% endblock %}

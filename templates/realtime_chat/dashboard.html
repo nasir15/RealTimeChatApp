@@ -1,0 +1,151 @@
+{% extends 'realtime_chat/base.html' %}
+{% load static %}
+
+{% block title %}Realtime Chat{% endblock %}
+
+{% block content %}
+<div class="chat-layout">
+    <aside class="chat-sidebar">
+        <div class="sidebar-card">
+            <div class="sidebar-header">
+                <div>
+                    <h2>{{ request.user.username }}</h2>
+                    <p>Private conversations</p>
+                </div>
+                <form method="post" action="{% url 'realtime_chat:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-link">Log out</button>
+                </form>
+            </div>
+            <ul class="conversation-list">
+                {% for user in users %}
+                    <li>
+                        <a href="?user={{ user.username }}" class="{% if active_user and active_user.pk == user.pk %}active{% endif %}">
+                            <span>{{ user.username }}</span>
+                            <small>{{ user.get_full_name|default:user.email }}</small>
+                        </a>
+                    </li>
+                {% empty %}
+                    <li class="empty-state">No other users are available yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="sidebar-card">
+            <h3>Group chats</h3>
+            <ul class="conversation-list">
+                {% for group in groups %}
+                    <li>
+                        <a href="?group={{ group.slug }}" class="{% if active_group and active_group.pk == group.pk %}active{% endif %}">
+                            <span>{{ group.name }}</span>
+                            <small>{{ group.members.count }} member{{ group.members.count|pluralize }}</small>
+                        </a>
+                    </li>
+                {% empty %}
+                    <li class="empty-state">No groups yet.</li>
+                {% endfor %}
+            </ul>
+            <form method="post" action="{% url 'realtime_chat:create_group' %}" class="group-form">
+                {% csrf_token %}
+                {{ group_form.as_p }}
+                <button type="submit">Create group</button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="chat-panel">
+        {% if active_user %}
+            <section
+                class="chat-room"
+                data-room-type="private"
+                data-room-target="{{ active_user.username }}"
+                data-history-url="{% url 'realtime_chat:private_history' active_user.username %}"
+            >
+                <header class="room-header">
+                    <div>
+                        <h1>Chat with {{ active_user.username }}</h1>
+                        <p>Direct messages update instantly for both users.</p>
+                    </div>
+                </header>
+                <div id="message-list" class="message-list">
+                    {% for message in private_messages %}
+                        <article class="message-bubble {% if message.sender_id == request.user.id %}own{% endif %}">
+                            <header>{{ message.sender.username }}</header>
+                            <p>{{ message.content }}</p>
+                            <time>{{ message.timestamp|date:"M d, Y H:i" }}</time>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Start the conversation.</p>
+                    {% endfor %}
+                </div>
+                <div id="typing-indicator" class="typing-indicator"></div>
+                <form id="chat-form" class="composer">
+                    <textarea id="chat-input" rows="3" placeholder="Type a message..."></textarea>
+                    <button type="submit">Send</button>
+                </form>
+            </section>
+        {% elif active_group %}
+            <section
+                class="chat-room"
+                data-room-type="group"
+                data-room-target="{{ active_group.slug }}"
+                data-history-url="{% url 'realtime_chat:group_history' active_group.slug %}"
+                data-is-member="{% if is_active_group_member %}true{% else %}false{% endif %}"
+            >
+                <header class="room-header">
+                    <div>
+                        <h1>{{ active_group.name }}</h1>
+                        <p>{{ active_group.description|default:'Group conversation with live updates and notifications.' }}</p>
+                    </div>
+                    <div class="room-actions">
+                        {% if is_active_group_member %}
+                            <form method="post" action="{% url 'realtime_chat:leave_group' active_group.slug %}">
+                                {% csrf_token %}
+                                <button type="submit" class="secondary">Leave group</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'realtime_chat:join_group' active_group.slug %}">
+                                {% csrf_token %}
+                                <button type="submit">Join group</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </header>
+                <div id="message-list" class="message-list">
+                    {% for message in group_messages %}
+                        <article class="message-bubble {% if message.sender_id == request.user.id %}own{% endif %}">
+                            <header>{{ message.sender.username }}</header>
+                            <p>{{ message.content }}</p>
+                            <time>{{ message.timestamp|date:"M d, Y H:i" }}</time>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">No messages yet.</p>
+                    {% endfor %}
+                </div>
+                <div id="typing-indicator" class="typing-indicator"></div>
+                {% if is_active_group_member %}
+                    <form id="chat-form" class="composer">
+                        <textarea id="chat-input" rows="3" placeholder="Message the group..."></textarea>
+                        <button type="submit">Send</button>
+                    </form>
+                {% else %}
+                    <p class="empty-state">Join the group to send messages and see live typing updates.</p>
+                {% endif %}
+            </section>
+        {% else %}
+            <section class="blank-room">
+                <h1>Select a conversation</h1>
+                <p>Pick a teammate for a private chat or open a group room from the sidebar.</p>
+            </section>
+        {% endif %}
+    </main>
+</div>
+
+<div id="notification-tray" class="notification-tray"></div>
+<script>
+    window.chatConfig = {
+        username: "{{ request.user.username }}",
+    };
+</script>
+<script src="{% static 'realtime_chat/chat.js' %}"></script>
+{% endblock %}
